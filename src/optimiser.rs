@@ -142,7 +142,7 @@ impl<'a> Swarm<'a> {
         }
     }
 
-    pub fn optimize(&mut self, iterations: usize) {
+    pub fn optimise(&mut self, iterations: usize) {
         for _ in 0..iterations {
             for p in &mut self.particles {
                 p.update_velocity(

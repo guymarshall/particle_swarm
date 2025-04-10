@@ -1,7 +1,7 @@
-mod optimizer;
+mod optimiser;
 mod plot_results;
 
-use optimizer::{Swarm, Xy};
+use optimiser::{Swarm, Xy};
 use plot_results::plot_results;
 
 fn main() {
@@ -44,7 +44,7 @@ fn main() {
         m_weight,
         s_weight,
     );
-    swarm.optimize(num_iterations);
+    swarm.optimise(num_iterations);
 
     let warehouse_locations = swarm
         .global_best_position

@@ -12,7 +12,7 @@ pub fn plot_results(
 
     let mut chart = ChartBuilder::on(&root)
         .caption(
-            "Optimized Warehouse Locations",
+            "Optimised Warehouse Locations",
             ("sans-serif", 30)
                 .into_font()
                 .color(&RGBColor(223, 223, 223)),
