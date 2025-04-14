@@ -13,7 +13,7 @@ fn distance(p1: &Xy, p2: &Xy) -> f64 {
 fn fitness_function(warehouse_positions: &[f64], stores: &[Xy], residential: &[Xy]) -> f64 {
     let warehouses: Vec<Xy> = warehouse_positions
         .chunks(2)
-        .map(|c| Xy { x: c[0], y: c[1] })
+        .map(|c: &[f64]| Xy { x: c[0], y: c[1] })
         .collect();
 
     let min_store_dists: Vec<f64> = stores
@@ -21,7 +21,7 @@ fn fitness_function(warehouse_positions: &[f64], stores: &[Xy], residential: &[X
         .map(|s| {
             warehouses
                 .iter()
-                .map(|w| distance(w, s))
+                .map(|w: &Xy| distance(w, s))
                 .fold(f64::INFINITY, f64::min)
         })
         .collect();
@@ -31,7 +31,7 @@ fn fitness_function(warehouse_positions: &[f64], stores: &[Xy], residential: &[X
         .map(|r| {
             warehouses
                 .iter()
-                .map(|w| distance(w, r))
+                .map(|w: &Xy| distance(w, r))
                 .fold(f64::INFINITY, f64::min)
         })
         .collect();
@@ -52,16 +52,16 @@ struct Particle {
 
 impl Particle {
     fn new(bounds: &[(f64, f64)], stores: &[Xy], residential: &[Xy]) -> Self {
-        let mut rng = rand::rng();
-        let position = bounds
+        let mut rng: rand::prelude::ThreadRng = rand::rng();
+        let position: Vec<f64> = bounds
             .iter()
             .map(|(lo, hi)| rng.random_range(*lo..=*hi))
             .collect::<Vec<_>>();
-        let velocity = bounds
+        let velocity: Vec<f64> = bounds
             .iter()
             .map(|_| rng.random_range(-1.0..=1.0))
             .collect::<Vec<_>>();
-        let fitness = fitness_function(&position, stores, residential);
+        let fitness: f64 = fitness_function(&position, stores, residential);
         Particle {
             best_position: position.clone(),
             best_fitness: fitness,
@@ -77,24 +77,24 @@ impl Particle {
         m_weight: f64,
         s_weight: f64,
     ) {
-        let mut rng = rand::rng();
-        (0..self.velocity.len()).for_each(|i| {
-            let inertia = i_weight * self.velocity[i];
-            let memory =
+        let mut rng: rand::prelude::ThreadRng = rand::rng();
+        (0..self.velocity.len()).for_each(|i: usize| {
+            let inertia: f64 = i_weight * self.velocity[i];
+            let memory: f64 =
                 m_weight * rng.random::<f64>() * (self.best_position[i] - self.position[i]);
-            let social = s_weight * rng.random::<f64>() * (global_best[i] - self.position[i]);
+            let social: f64 = s_weight * rng.random::<f64>() * (global_best[i] - self.position[i]);
             self.velocity[i] = inertia + memory + social;
         });
     }
 
     fn update_position(&mut self, bounds: &[(f64, f64)], stores: &[Xy], residential: &[Xy]) {
-        (0..self.position.len()).for_each(|i| {
+        (0..self.position.len()).for_each(|i: usize| {
             self.position[i] += self.velocity[i];
             let (lo, hi) = bounds[i];
             self.position[i] = self.position[i].clamp(lo, hi);
         });
 
-        let fitness = fitness_function(&self.position, stores, residential);
+        let fitness: f64 = fitness_function(&self.position, stores, residential);
         if fitness > self.best_fitness {
             self.best_fitness = fitness;
             self.best_position = self.position.clone();
@@ -124,11 +124,11 @@ impl<'a> Swarm<'a> {
         m_weight: f64,
         s_weight: f64,
     ) -> Self {
-        let particles = (0..num_particles)
+        let particles: Vec<Particle> = (0..num_particles)
             .map(|_| Particle::new(bounds, stores, residential))
             .collect::<Vec<_>>();
 
-        let best = &particles[0];
+        let best: &Particle = &particles[0];
         Swarm {
             global_best_position: best.best_position.clone(),
             global_best_fitness: best.best_fitness,
